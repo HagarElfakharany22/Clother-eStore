@@ -1,0 +1,76 @@
+<div class="dashboard-container">
+  <h2>Orders Report</h2>
+
+  <!-- Cards للأرقام الأساسية -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Total Orders</h3>
+      <p>{{ report.overallStats[0].totalOrders || 0 }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Total Revenue</h3>
+      <p>${{ report.overallStats[0].totalRevenue || 0 }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Total Items Sold</h3>
+      <p>{{ report.overallStats[0].totalItemsSold || 0 }}</p>
+    </div>
+  </div>
+
+  <!-- Order Status Breakdown -->
+  <h3>Order Status Breakdown</h3>
+  <div class="status-grid">
+    <div class="status-card" *ngFor="let status of report.orderStatusStats">
+      <p>{{ status._id }}: {{ status.count }}</p>
+    </div>
+  </div>
+
+  <!-- Top Products Table -->
+  <h3>Top Products</h3>
+  <table class="dashboard-table" *ngIf="report.topProducts.length > 0; else noProducts">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Sold</th>
+        <th>Revenue</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of report.topProducts">
+        <td>{{ product.name }}</td>
+        <td>{{ product.totalSold }}</td>
+        <td>${{ product.revenue }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noProducts>
+    <p>No top products data</p>
+  </ng-template>
+
+  <!-- Top Users Table -->
+  <h3>Top Customers</h3>
+  <table class="dashboard-table" *ngIf="report.topUsers.length > 0; else noUsers">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Total Spent</th>
+        <th>Orders</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of report.topUsers">
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>${{ user.totalSpent }}</td>
+        <td>{{ user.ordersCount }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noUsers>
+    <p>No top users data</p>
+  </ng-template>
+</div>
+

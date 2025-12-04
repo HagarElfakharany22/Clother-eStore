@@ -1,0 +1,31 @@
+<div class="testimonial-form">
+  <h2>Add Testimonial</h2>
+  <form [formGroup]="testimonialForm" (ngSubmit)="onSubmit()">
+    <label>
+      Name:
+      <input type="text" formControlName="name" placeholder="Your name" />
+    </label>
+    <div *ngIf="testimonialForm.get('name')?.invalid && testimonialForm.get('name')?.touched" class="error">
+      Name is required.
+    </div>
+
+    <label>
+      Message:
+      <textarea formControlName="message" placeholder="Your testimonial"></textarea>
+    </label>
+    <div *ngIf="testimonialForm.get('message')?.invalid && testimonialForm.get('message')?.touched" class="error">
+      Message is required and should be at least 10 characters.
+    </div>
+
+    <label>
+      Rating (1-5):
+      <input type="number" formControlName="rating" min="1" max="5" />
+    </label>
+    <div *ngIf="testimonialForm.get('rating')?.invalid && testimonialForm.get('rating')?.touched" class="error">
+      Rating must be between 1 and 5.
+    </div>
+
+    <button type="submit">Submit Testimonial</button>
+  </form>
+</div>
+

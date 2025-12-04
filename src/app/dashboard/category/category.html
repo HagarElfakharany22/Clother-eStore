@@ -1,0 +1,125 @@
+<!-- category.component.html -->
+<div class="category-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h2>Category Management</h2>
+    <button class="btn-primary" (click)="openAddModal()">
+      <span class="icon">+</span> Add New Category
+    </button>
+  </div>
+
+  <!-- Search and Filter -->
+  <div class="search-section">
+    <input 
+      type="text" 
+      placeholder="Search categories..." 
+      [(ngModel)]="searchTerm"
+      (input)="filterCategories()"
+      class="search-input"
+    />
+  </div>
+
+  <!-- Categories Table -->
+  <div class="table-container">
+    <table class="categories-table" *ngIf="filteredCategories.length > 0; else noData">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Slug</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of filteredCategories">
+          <td>{{ category._id }}</td>
+          <td>{{ category.name }}</td>
+          <td>{{ category.slug }}</td>
+          <td>{{ category.createdAt | date:'short' }}</td>
+          <td class="actions">
+            <button class="btn-edit" (click)="openEditModal(category)" title="Edit">
+              ✏️
+            </button>
+            <button class="btn-delete" (click)="deleteCategory(category._id)" title="Delete">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noData>
+      <div class="no-data">
+        <p>No categories found</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ isEditMode ? 'Edit Category' : 'Add New Category' }}</h3>
+        <button class="close-btn" (click)="closeModal()">✕</button>
+      </div>
+
+      <form [formGroup]="categoryForm" (ngSubmit)="submitForm()">
+        <div class="form-group">
+          <label for="name">Category Name *</label>
+          <input 
+            type="text" 
+            id="name"
+            formControlName="name"
+            placeholder="Enter category name"
+            (input)="generateSlug()"
+            [class.error]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
+          />
+          <span class="error-message" *ngIf="categoryForm.get('name')?.hasError('required') && categoryForm.get('name')?.touched">
+            Category name is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="slug">Slug *</label>
+          <input 
+            type="text" 
+            id="slug"
+            formControlName="slug"
+            placeholder="category-slug"
+            [class.error]="categoryForm.get('slug')?.invalid && categoryForm.get('slug')?.touched"
+          />
+          <span class="error-message" *ngIf="categoryForm.get('slug')?.hasError('required') && categoryForm.get('slug')?.touched">
+            Slug is required
+          </span>
+        </div>
+     <div class="form-group">
+          <label class="toggle-label">
+            <span>Active Status</span>
+            <div class="toggle-container">
+              <input 
+                type="checkbox" 
+                id="isActive"
+                formControlName="isActive"
+                class="toggle-checkbox"
+              />
+              <label for="isActive" class="toggle-switch"></label>
+              <span class="toggle-text">{{ categoryForm.get('isActive')?.value ? 'Active' : 'Inactive' }}</span>
+            </div>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn-submit" [disabled]="categoryForm.invalid || isLoading">
+            {{ isLoading ? 'Saving...' : (isEditMode ? 'Update' : 'Add') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+</div>

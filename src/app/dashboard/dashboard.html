@@ -1,0 +1,66 @@
+<!-- dashboard.html -->
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.active]="sidebarOpen">
+    <div class="sidebar-header">
+      <h2>Dashboard</h2>
+      <button class="close-btn" (click)="toggleSidebar()">✕</button>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard/home" routerLinkActive="active" class="nav-item">
+        <span class="icon">🏠</span>
+        <span>Home</span>
+      </a>
+      <a routerLink="/dashboard/products" routerLinkActive="active" class="nav-item">
+        <span class="icon">📦</span>
+        <span>Products</span>
+      </a>
+      <a routerLink="/dashboard/category" routerLinkActive="active" class="nav-item">
+        <span class="icon">📂</span>
+        <span>Category</span>
+      </a>
+      <a routerLink="/dashboard/subCategory" routerLinkActive="active" class="nav-item">
+        <span class="icon">📑</span>
+        <span>Subcategory</span>
+      </a>
+      <a routerLink="/dashboard/testimonial" routerLinkActive="active" class="nav-item">
+        <span class="icon">⭐</span>
+        <span>Testimonial</span>
+      </a>
+      <a routerLink="/dashboard/orders" routerLinkActive="active" class="nav-item">
+        <span class="icon">🛒</span>
+        <span>Orders</span>
+      </a>
+      <a routerLink="/dashboard/users" routerLinkActive="active" class="nav-item">
+        <span class="icon">👥</span>
+        <span>Users</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <button class="menu-toggle" (click)="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <div class="welcome-section">
+        <h1>Welcome, <span class="user-name">{{name}}</span></h1>
+      </div>
+      
+      <div class="user-profile">
+        <div class="profile-avatar">{{name.charAt(0).toUpperCase()}}</div>
+      </div>
+    </header>
+
+    <!-- Router Outlet Content -->
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,273 @@
+<!-- my-orders.html -->
+<div class="orders-page">
+  <h1>My Orders</h1>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <input 
+      type="text" 
+      placeholder="Search by Order ID or Phone..." 
+      [(ngModel)]="searchTerm"
+      (input)="filterOrders()"
+      class="search-input"
+    />
+
+    <select [(ngModel)]="selectedStatus" (change)="filterOrders()" class="status-filter">
+      <option value="">All Status</option>
+      <option value="pending">Pending</option>
+      <option value="prepared">Prepared</option>
+      <option value="shipped">Shipped</option>
+      <option value="recieved">Received</option>
+      <option value="canceled">Canceled</option>
+    </select>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading orders...</p>
+  </div>
+
+  <!-- Orders List -->
+  <div class="orders-list" *ngIf="!isLoading && filteredOrders.length > 0">
+    <div class="order-card" *ngFor="let order of filteredOrders">
+      <!-- Order Header -->
+      <div class="order-header">
+        <div class="order-info">
+          <p class="order-id">Order #{{ order._id }}</p>
+          <p class="order-date">{{ order.orderAt | date:'medium' }}</p>
+        </div>
+        <span class="status-badge" [style.background]="getStatusColor(order.orderStatus)">
+          {{ order.orderStatus }}
+        </span>
+      </div>
+
+      <!-- Order Items Preview -->
+      <div class="order-items-preview">
+        <div class="item-preview" *ngFor="let item of order.items.slice(0, 2)">
+          <img [src]="uploadUrl+item.productId?.imgURL || 'assets/placeholder.jpg'" [alt]="item.productId?.name" />
+        </div>
+        <p class="items-count" *ngIf="order.items.length > 2">
+          +{{ order.items.length - 2 }} more
+        </p>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <div class="summary-item">
+          <span class="label">Items:</span>
+          <span class="value">{{ getTotalItems(order) }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Total:</span>
+          <span class="value price">{{ order.totalPrice | currency:'EGP' }}</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="order-actions">
+        <button class="btn-view" (click)="openDetailsModal(order)">
+          View Details
+        </button>
+        <button 
+          class="btn-edit" 
+          (click)="openEditModal(order)" 
+          *ngIf="canEdit(order)"
+        >
+          Edit Order
+        </button>
+        <button 
+          class="btn-cancel" 
+          (click)="cancelOrder(order)" 
+          *ngIf="order.orderStatus === 'pending'"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Orders -->
+  <div class="no-orders" *ngIf="!isLoading && filteredOrders.length === 0">
+    <div class="empty-icon">📦</div>
+    <h2>No orders found</h2>
+    <p>Start shopping to see your orders here</p>
+    <button class="shop-btn" routerLink="/products">Shop Now</button>
+  </div>
+
+  <!-- Details Modal -->
+  <div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Order Details</h3>
+        <button class="close-btn" (click)="closeDetailsModal()">✕</button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedOrder">
+        <!-- Order Info -->
+        <div class="details-section">
+          <h4>Order Information</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Order ID:</span>
+              <span class="value">{{ selectedOrder._id }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Order Date:</span>
+              <span class="value">{{ selectedOrder.orderAt | date:'medium' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Status:</span>
+              <span class="status-badge" [style.background]="getStatusColor(selectedOrder.orderStatus)">
+                {{ selectedOrder.orderStatus }}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="label">Total Price:</span>
+              <span class="value price-large">{{ selectedOrder.totalPrice | currency:'EGP' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="details-section">
+          <h4>Shipping Address</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Governate:</span>
+              <span class="value">{{ selectedOrder.address.governate }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">City:</span>
+              <span class="value">{{ selectedOrder.address.city }}</span>
+            </div>
+            <div class="info-item full-width">
+              <span class="label">Address Details:</span>
+              <span class="value">{{ selectedOrder.address.addressDetails }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Phone:</span>
+              <span class="value">{{ selectedOrder.phone }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="details-section">
+          <h4>Order Items</h4>
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of selectedOrder.items">
+                <td>
+                  <div class="product-cell">
+                    <img [src]="uploadUrl +item.productId?.imgURL || 'assets/placeholder.jpg'" [alt]="item.productId?.name" />
+                    <span>{{ item.productId?.name || 'Product' }}</span>
+                  </div>
+                </td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.priceAtOrder | currency:'EGP' }}</td>
+                <td>{{ getItemSubtotal(item) | currency:'EGP' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                <td><strong>{{ selectedOrder.totalPrice | currency:'EGP' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Edit Order</h3>
+        <button class="close-btn" (click)="closeEditModal()">✕</button>
+      </div>
+
+      <form [formGroup]="editForm" (ngSubmit)="saveChanges()">
+        <div class="modal-body">
+          <p class="edit-note">
+            ℹ️ You can only edit orders with status: <strong>Pending</strong> or <strong>Prepared</strong>
+          </p>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="governate">Governate *</label>
+              <input 
+                type="text" 
+                id="governate"
+                formControlName="governate"
+                [class.error]="editForm.get('governate')?.invalid && editForm.get('governate')?.touched"
+              />
+              <span class="error-message" *ngIf="editForm.get('governate')?.hasError('required') && editForm.get('governate')?.touched">
+                Required
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="city">City *</label>
+              <input 
+                type="text" 
+                id="city"
+                formControlName="city"
+                [class.error]="editForm.get('city')?.invalid && editForm.get('city')?.touched"
+              />
+              <span class="error-message" *ngIf="editForm.get('city')?.hasError('required') && editForm.get('city')?.touched">
+                Required
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="addressDetails">Address Details *</label>
+            <textarea 
+              id="addressDetails"
+              formControlName="addressDetails"
+              rows="3"
+              [class.error]="editForm.get('addressDetails')?.invalid && editForm.get('addressDetails')?.touched"
+            ></textarea>
+            <span class="error-message" *ngIf="editForm.get('addressDetails')?.hasError('required') && editForm.get('addressDetails')?.touched">
+              Required
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone *</label>
+            <input 
+              type="tel" 
+              id="phone"
+              formControlName="phone"
+              [class.error]="editForm.get('phone')?.invalid && editForm.get('phone')?.touched"
+            />
+            <span class="error-message" *ngIf="editForm.get('phone')?.hasError('required') && editForm.get('phone')?.touched">
+              Required
+            </span>
+            <span class="error-message" *ngIf="editForm.get('phone')?.hasError('pattern') && editForm.get('phone')?.touched">
+              Invalid phone number
+            </span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn-submit" [disabled]="editForm.invalid || isLoading">
+            {{ isLoading ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

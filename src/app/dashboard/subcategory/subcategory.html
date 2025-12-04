@@ -1,0 +1,143 @@
+<!-- subcategory.html -->
+<div class="subcategory-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h2>Subcategory Management</h2>
+    <button class="btn-primary" (click)="openAddModal()">
+      <span class="icon">+</span> Add New Subcategory
+    </button>
+  </div>
+
+  <!-- Search and Filter -->
+  <div class="search-section">
+    <input 
+      type="text" 
+      placeholder="Search subcategories..." 
+      [(ngModel)]="searchTerm"
+      (input)="filterSubCategory()"
+      class="search-input"
+    />
+  </div>
+
+  <!-- Subcategories Table -->
+  <div class="table-container">
+    <table class="subcategories-table" *ngIf="filteredsubCategories.length > 0; else noData">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Slug</th>
+          <th>Category ID</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let subcategory of filteredsubCategories">
+          <td>{{ subcategory._id }}</td>
+          <td>{{ subcategory.name }}</td>
+          <td>{{ subcategory.slug }}</td>
+          <td>{{ subcategory.category._id }}</td>
+          <td>{{ subcategory.createdAt | date:'short' }}</td>
+          <td class="actions">
+            <button class="btn-edit" (click)="openEditModal(subcategory)" title="Edit">
+              ✏️
+            </button>
+            <button class="btn-delete" (click)="deletesubCategory(subcategory._id)" title="Delete">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noData>
+      <div class="no-data">
+        <p>No subcategories found</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ isEditMode ? 'Edit Subcategory' : 'Add New Subcategory' }}</h3>
+        <button class="close-btn" (click)="closeModal()">✕</button>
+      </div>
+
+      <form [formGroup]="subCategoryForm" (ngSubmit)="submitForm()">
+        <div class="form-group">
+          <label for="name">Subcategory Name *</label>
+          <input 
+            type="text" 
+            id="name"
+            formControlName="name"
+            placeholder="Enter subcategory name"
+            (input)="generateSlug()"
+            [class.error]="subCategoryForm.get('name')?.invalid && subCategoryForm.get('name')?.touched"
+          />
+          <span class="error-message" *ngIf="subCategoryForm.get('name')?.hasError('required') && subCategoryForm.get('name')?.touched">
+            Subcategory name is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="slug">Slug *</label>
+          <input 
+            type="text" 
+            id="slug"
+            formControlName="slug"
+            placeholder="subcategory-slug"
+            [class.error]="subCategoryForm.get('slug')?.invalid && subCategoryForm.get('slug')?.touched"
+          />
+          <span class="error-message" *ngIf="subCategoryForm.get('slug')?.hasError('required') && subCategoryForm.get('slug')?.touched">
+            Slug is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="categoryId">Category ID *</label>
+          <input 
+            type="text" 
+            id="categoryId"
+            formControlName="categoryId"
+            placeholder="Enter category ID"
+            [class.error]="subCategoryForm.get('categoryId')?.invalid && subCategoryForm.get('categoryId')?.touched"
+          />
+          <span class="error-message" *ngIf="subCategoryForm.get('categoryId')?.hasError('required') && subCategoryForm.get('categoryId')?.touched">
+            Category ID is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label class="toggle-label">
+            <span>Active Status</span>
+            <div class="toggle-container">
+              <input 
+                type="checkbox" 
+                id="isActive"
+                formControlName="isActive"
+                class="toggle-checkbox"
+              />
+              <label for="isActive" class="toggle-switch"></label>
+              <span class="toggle-text">{{ subCategoryForm.get('isActive')?.value ? 'Active' : 'Inactive' }}</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn-submit" [disabled]="subCategoryForm.invalid || isLoading">
+            {{ isLoading ? 'Saving...' : (isEditMode ? 'Update' : 'Add') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+</div>

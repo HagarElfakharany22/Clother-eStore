@@ -1,0 +1,85 @@
+<div class="auth-page-container">
+    <div class="auth-card register-card">
+        <h2 class="card-title">Create Account</h2>
+        <p class="card-subtitle">Join us and start shopping!</p>
+
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" formControlName="name" id="fullName" name="fullName" placeholder="Your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" formControlName="email" name="email" placeholder="Your email address">
+                @if(registerForm.get('email')!.touched && registerForm.get('email')!.errors?.['required']) {
+                <div class="msg">Email is required</div>
+                }
+
+                @if(registerForm.get('email')!.touched && registerForm.get('email')!.errors?.['email']) {
+                <div class="msg">Invalid email format</div>
+                }
+               <div *ngIf="isduplicated" class="msg">This email already exists</div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" formControlName="password" name="password"
+                    placeholder="At least 6 characters">
+                @if(registerForm.get('password')!.touched && registerForm.get('password')!.errors?.['required']) {
+                <div class="msg">Password is required</div>
+                } @else if (registerForm.get('password')!.touched &&
+                registerForm.get('password')!.errors?.['passwordStrength']) {
+                <div class="msg">Password must be at least 6 characters</div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" formControlName="confirmPassword"
+                    placeholder="Re-enter password">
+                @if (registerForm.get('confirmPassword')!.touched &&
+                registerForm.get('confirmPassword')!.errors?.['required']) {
+                <div class="msg">confirmPasswordpassword is required</div>
+
+                } @else if (registerForm.get('confirmPassword')!.touched &&
+                registerForm.get('confirmPassword')!.errors?.['passwordismatch']) {
+                <div class="msg">confirmPassword password must match </div>
+                }
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" id="phone" formControlName="phone" name="phone" placeholder="enter your phone ">
+            </div>
+            <h3 class="section-heading">Delivery Address</h3>
+
+            <div class="form-group" formGroupName="address">
+                <label for="governate" class="form-label">Governorate</label>
+                <input type="text" formControlName="governate" class="form-control" id="governate"
+                    placeholder="cairo giza">
+
+                <div class="form-group">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" formControlName="city" id="city"
+                        placeholder="e.g., Nasr City, Mohandessin">
+                </div>
+
+                <div class="form-group">
+                    <label for="detailedAddress" class="form-label">Detailed Address</label>
+                    <textarea class="form-control" id="detailedAddress" formControlName="detailedAddress" rows="3"
+                        placeholder="Street name, building number, flat number, landmark"></textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-accent" [disabled]="registerForm.invalid">Register Now</button>
+            </div>
+        </form>
+
+        <div class="links-section">
+            <span class="register-link">
+                Already have an account? <a routerLink="login" class="link-action">Log In</a>
+            </span>
+        </div>
+    </div>
+</div>

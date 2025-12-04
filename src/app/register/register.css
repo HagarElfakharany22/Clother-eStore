@@ -1,0 +1,138 @@
+/* --- Register Specific Adjustments --- */
+.register-card {
+    max-width: 450px; 
+}
+
+/* --- Button Styles (Addition for Register) --- */
+.secondary-btn {
+    background-color: #28A745; 
+    color: white;
+}
+
+.secondary-btn:hover {
+    background-color: #1e7e34; 
+    transform: translateY(-1px);
+}
+/* --- General Page/Container Styles --- */
+.auth-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #F4F6F9; /* Light Gray/Off-White Background */
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+/* --- Card Style --- */
+.auth-card {
+    background: #FFFFFF;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Soft Shadow */
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+
+/* --- Typography --- */
+.card-title {
+    color: #007BFF; /* Deep Blue Primary Color */
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 2em;
+}
+
+.card-subtitle {
+    color: #888;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1em;
+}
+
+/* --- Form Styles --- */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.auth-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #343A40; /* Dark Text */
+}
+
+.auth-form input ,textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #E0E0E0;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.auth-form input:focus {
+    border-color: #007BFF;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); /* Soft blue glow on focus */
+}
+
+/* --- Button Styles --- */
+.btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.primary-btn {
+    background-color: #007BFF; 
+    color: white;
+}
+
+.primary-btn:hover {
+    background-color: #0056b3; 
+    transform: translateY(-1px);
+}
+
+/* --- Links --- */
+.links-section {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.link-text {
+    color: #888;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 10px;
+    transition: color 0.3s;
+}
+
+.link-action {
+    color: #FFC107; 
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.link-text:hover,
+.link-action:hover {
+    color: #007BFF;
+}
+.msg{
+    color:red
+}
+
+/* --- Responsive Adaption (Minimal needed due to Flexbox/Max-width) --- */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+}

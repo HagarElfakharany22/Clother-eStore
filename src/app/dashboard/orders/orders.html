@@ -1,0 +1,209 @@
+<!-- order.html -->
+<div class="order-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h2>Order Management</h2>
+    
+    <!-- Status Filter Buttons -->
+    <div class="status-filters">
+      <button class="filter-btn" (click)="filterByStatus('all')">All</button>
+      <button class="filter-btn" (click)="filterByStatus('pending')">Pending</button>
+      <button class="filter-btn" (click)="filterByStatus('prepared')">Prepared</button>
+      <button class="filter-btn" (click)="filterByStatus('shipped')">Shipped</button>
+      <button class="filter-btn" (click)="filterByStatus('recieved')">Received</button>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <input 
+      type="text" 
+      placeholder="Search by Order ID, User, Phone, Status..." 
+      [(ngModel)]="searchTerm"
+      (input)="filterOrders()"
+      class="search-input"
+    />
+  </div>
+
+  <!-- Orders Table -->
+  <div class="table-container">
+    <table class="orders-table" *ngIf="filteredOrders.length > 0; else noData">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>User</th>
+          <th>Phone</th>
+          <th>Items</th>
+          <th>Total Price</th>
+          <th>Status</th>
+          <th>Order Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of filteredOrders">
+          <td class="order-id">{{ order._id }}</td>
+          <td>{{ order.user?.name || 'N/A' }}</td>
+          <td>{{ order.phone }}</td>
+          <td>{{ getTotalItems(order) }} items</td>
+          <td class="price">{{ order.totalPrice | currency:'EGP' }}</td>
+          <td>
+            <span class="status-badge" [style.background]="getStatusColor(order.orderStatus)">
+              {{ order.orderStatus }}
+            </span>
+          </td>
+          <td>{{ order.orderAt | date:'short' }}</td>
+          <td class="actions">
+            <button class="btn-view" (click)="openDetailsModal(order)" title="View Details">
+              View
+            </button>
+            <button class="btn-edit" (click)="openStatusModal(order)" title="Change Status">
+              Edit
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noData>
+      <div class="no-data">
+        <p>No orders found</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Change Status Modal -->
+  <div class="modal-overlay" *ngIf="showStatusModal" (click)="closeStatusModal()">
+    <div class="modal-content modal-small" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Change Order Status</h3>
+        <button class="close-btn" (click)="closeStatusModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="order-info">Order ID: <strong>{{ selectedOrder?._id }}</strong></p>
+        
+        <div class="form-group">
+          <label for="status">Select New Status</label>
+          <select id="status" [(ngModel)]="selectedStatus" class="status-select">
+            <option *ngFor="let status of statusOptions" [value]="status.value">
+              {{ status.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeStatusModal()">Cancel</button>
+          <button type="button" class="btn-submit" (click)="changeStatus()" [disabled]="isLoading">
+            {{ isLoading ? 'Updating...' : 'Update Status' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Details Modal -->
+  <div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Order Details</h3>
+        <button class="close-btn" (click)="closeDetailsModal()">✕</button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedOrder">
+        <!-- Order Info -->
+        <div class="details-section">
+          <h4>Order Information</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Order ID:</span>
+              <span class="value">{{ selectedOrder._id }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Order Date:</span>
+              <span class="value">{{ selectedOrder.orderAt | date:'medium' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Status:</span>
+              <span class="status-badge" [style.background]="getStatusColor(selectedOrder.orderStatus)">
+                {{ selectedOrder.orderStatus }}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="label">Total Price:</span>
+              <span class="value price-large">{{ selectedOrder.totalPrice | currency:'EGP' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="details-section">
+          <h4>Customer Information</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Name:</span>
+              <span class="value">{{ selectedOrder.user?.name || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Phone:</span>
+              <span class="value">{{ selectedOrder.phone }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Info -->
+        <div class="details-section">
+          <h4>Shipping Address</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Governate:</span>
+              <span class="value">{{ selectedOrder.address.governate }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">City:</span>
+              <span class="value">{{ selectedOrder.address.city }}</span>
+            </div>
+            <div class="info-item full-width">
+              <span class="label">Address Details:</span>
+              <span class="value">{{ selectedOrder.address.addressDetails }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="details-section">
+          <h4>Order Items</h4>
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price at Order</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of selectedOrder.items">
+                <td>{{ item.productId?.name || 'Product' }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.priceAtOrder | currency:'EGP' }}</td>
+                <td>{{ (item.quantity * item.priceAtOrder) | currency:'EGP' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                <td><strong>{{ selectedOrder.totalPrice | currency:'EGP' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+</div>

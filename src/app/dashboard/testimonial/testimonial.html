@@ -1,0 +1,117 @@
+<!-- testimonial.html -->
+<div class="testimonial-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h2>Testimonial Management</h2>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'new'"
+        (click)="switchTab('new')"
+      >
+        New Testimonials
+        <span class="badge" *ngIf="newTestimonials.length > 0">{{ newTestimonials.length }}</span>
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'old'"
+        (click)="switchTab('old')"
+      >
+        Old Testimonials
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <input 
+      type="text" 
+      placeholder="Search testimonials..." 
+      [(ngModel)]="searchTerm"
+      (input)="filterTestimonials()"
+      class="search-input"
+    />
+  </div>
+
+  <!-- Testimonials Table -->
+  <div class="table-container">
+    <table class="testimonials-table" *ngIf="filteredTestimonials.length > 0; else noData">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Message</th>
+          <th>Rating</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let testimonial of filteredTestimonials">
+          <td>{{ testimonial.user.name }}</td>
+          <td>{{ testimonial.user.email || 'N/A' }}</td>
+          <td class="message-cell">
+            <div class="message-content">{{ testimonial.message }}</div>
+          </td>
+          <td>
+            <div class="rating">
+              <span *ngFor="let star of [1,2,3,4,5]" class="star" [class.filled]="star <= (testimonial.rating || 0)">
+                ⭐
+              </span>
+            </div>
+          </td>
+         <td>
+  <span 
+    class="status-badge" 
+    [class.approved]="testimonial.status === 'old'" 
+    [class.pending]="testimonial.status !== 'old'">
+      
+    {{ testimonial.status === 'old' ? 'Approved' : 'Pending' }}
+  </span>
+</td>
+<td>{{ testimonial.createdAt | date:'short' }}</td>
+<td class="actions">
+            <button 
+              class="btn-approve" 
+              (click)="approveTestimonial(testimonial._id)" 
+              title="Approve"
+              *ngIf="testimonial.status !== 'approved'"
+            >
+              ✓
+            </button>
+            <!-- <button 
+              [class.visible ]="testimonial.isVisible" 
+              [class.hide ]="!testimonial.isVisible"
+              (click)="hideTestimonial(testimonial._id)" 
+              title="Hide/Show"
+            >
+              {{ testimonial.isVisible ? 'hide' : 'show' }}
+            </button> -->
+ 
+            <button 
+              class="btn-hide" 
+              (click)="hideTestimonial(testimonial._id)" 
+              title="Hide/Show"
+            >
+              {{ testimonial.isVisible ? 'hide' : 'show' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noData>
+      <div class="no-data">
+        <p>No testimonials found</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+</div>
