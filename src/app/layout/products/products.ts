@@ -18,8 +18,8 @@ import { CartService } from '../../cores/services/cart-service';
   styleUrl: './products.css',
 })
 export class Products implements OnInit {
- allProducts: IProduct[] = []; // المنتجات القادمة من الباك للصفحة الحالية
-  displayedProducts: IProduct[] = []; // المنتجات بعد تطبيق الفلاتر
+ allProducts: IProduct[] = []; 
+  displayedProducts: IProduct[] = [];   
   uploadUrl = environment.staticFilesURL;
 
   categories: ICategory[] = [];
@@ -53,12 +53,11 @@ export class Products implements OnInit {
     this.isLoading = true;
     this.productService.getProducts(this.currentPage, this.itemsPerPage).subscribe({
       next: (res) => {
-        // بيانات الباك للصفحة الحالية
+      
         this.allProducts = res.results;
         this.totalPages = res.totalPages;
         this.currentPage = res.page;
-
-        // طبق الفلاتر على الصفحة الحالية
+        
         this.applyFilters();
 
         this.isLoading = false;
