@@ -18,48 +18,49 @@ import { CartService } from '../../cores/services/cart-service';
   styleUrl: './products.css',
 })
 export class Products implements OnInit {
-  allProducts: IProduct[] = [];
-  uploadUrl=environment.staticFilesURL;
-  filteredProducts: IProduct[] = [];
-  
-  displayedProducts: IProduct[] = [];
-  
+ allProducts: IProduct[] = []; // المنتجات القادمة من الباك للصفحة الحالية
+  displayedProducts: IProduct[] = []; // المنتجات بعد تطبيق الفلاتر
+  uploadUrl = environment.staticFilesURL;
+
   categories: ICategory[] = [];
   subcategories: IsubCategory[] = [];
-  
+
   selectedCategory = '';
   selectedSubcategory = '';
   minPrice: number | undefined;
   maxPrice: number | undefined;
   searchTerm = '';
-  
+
   // Pagination
   currentPage = 1;
-  itemsPerPage = 8;
+  itemsPerPage = 4;
   totalPages = 0;
-  
+
   isLoading = false;
 
   constructor(
     private productService: ProductService,
     private categoryService: Categoryservice,
-    private _cartService:CartService
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
     this.loadCategories();
-    this.loadAllProducts();
+    this.loadPaginatedProducts();
   }
 
-  loadAllProducts(): void {
+  loadPaginatedProducts() {
     this.isLoading = true;
-    this.productService.getAllProducts().subscribe({
+    this.productService.getProducts(this.currentPage, this.itemsPerPage).subscribe({
       next: (res) => {
-        // console.log(res.data);
-        
-        this.allProducts = res.data;
-        // this.filteredProducts=res.data;
-        this.applyFilters(); 
+        // بيانات الباك للصفحة الحالية
+        this.allProducts = res.results;
+        this.totalPages = res.totalPages;
+        this.currentPage = res.page;
+
+        // طبق الفلاتر على الصفحة الحالية
+        this.applyFilters();
+
         this.isLoading = false;
       },
       error: (err) => {
@@ -81,85 +82,53 @@ export class Products implements OnInit {
   onCategoryChange(): void {
     this.selectedSubcategory = '';
     this.subcategories = [];
-    
+
     if (this.selectedCategory) {
       this.categoryService.getCategoryBySlug(this.selectedCategory).subscribe({
         next: (res) => {
-          console.log(res.data.slug )
           this.subcategories = res.data.subCategories || [];
-          // console.log();
-          
         },
         error: (err) => console.error('Error loading subcategories:', err)
       });
     }
-    
+
     this.applyFilters();
   }
 
   applyFilters(): void {
-    this.filteredProducts = this.allProducts;
-console.log(this.filteredProducts);
+    this.displayedProducts = [...this.allProducts];
 
     if (this.searchTerm.trim()) {
       const search = this.searchTerm.toLowerCase();
-      this.filteredProducts = this.filteredProducts.filter(p =>
+      this.displayedProducts = this.displayedProducts.filter(p =>
         p.name.toLowerCase().includes(search) ||
         p.description?.toLowerCase().includes(search)
       );
     }
 
     if (this.selectedCategory) {
-      console.log("selesctaed vate",this.selectedCategory);
-      
-      this.filteredProducts = this.filteredProducts.filter(
-        p => p.Category.slug === this.selectedCategory
+      this.displayedProducts = this.displayedProducts.filter(
+        p => p.Category?.slug === this.selectedCategory
       );
-    //  console.log("after cate",this.filteredProducts)
-      
-    //   this.filteredProducts.forEach(it=>console.log(it)
-    //   )
-      console.log("after cate",this.filteredProducts)
     }
 
     if (this.selectedSubcategory) {
-      console.log("selectedSubcategory",this.selectedSubcategory)
-      console.log("filerdProd",this.filteredProducts);
-      
-        // this.filteredProducts.forEach(fil=>console.log(fil.subCategory.slug)
-        //  )
-  this.filteredProducts = this.filteredProducts.filter(
-    p => p.subCategory?.slug === this.selectedSubcategory
-  );
-
-
+      this.displayedProducts = this.displayedProducts.filter(
+        p => p.subCategory?.slug === this.selectedSubcategory
+      );
     }
 
     if (this.minPrice !== undefined) {
-      this.filteredProducts = this.filteredProducts.filter(
+      this.displayedProducts = this.displayedProducts.filter(
         p => p.price >= this.minPrice!
       );
     }
 
     if (this.maxPrice !== undefined) {
-      this.filteredProducts = this.filteredProducts.filter(
+      this.displayedProducts = this.displayedProducts.filter(
         p => p.price <= this.maxPrice!
       );
     }
-
-    this.calculatePagination();
-  }
-
-  calculatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
-    
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = 1;
-    }
-    
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.displayedProducts = this.filteredProducts.slice(startIndex, endIndex);
   }
 
   clearFilters(): void {
@@ -170,49 +139,46 @@ console.log(this.filteredProducts);
     this.searchTerm = '';
     this.subcategories = [];
     this.currentPage = 1;
-    this.applyFilters();
+    this.loadPaginatedProducts(); 
   }
 
-  goToPage(page: number): void {
+  goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.calculatePagination();
-      window.scrollTo({ top: 0, behavior: 'smooth' }); // scroll للأعلى
+      this.loadPaginatedProducts();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.goToPage(this.currentPage - 1);
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.goToPage(this.currentPage + 1);
-    }
-  }
+  previousPage() { this.goToPage(this.currentPage - 1); }
+  nextPage() { this.goToPage(this.currentPage + 1); }
 
   getPagesArray(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
   onSearch(): void {
-    this.currentPage = 1; 
+  
     this.applyFilters();
   }
-  addToCart(id:string){
-     this._cartService.addToCart({
-    productId: id,
-    quantity: 1
-  }).subscribe({
-    next: (res) => {
-      console.log("Added:", res);
-    },
-    error: (err) => {
-      console.log(err);
-    }
-  })
-}
+
+  addToCart(product: IProduct) {
+    this.cartService.addToCart({
+      productId: product._id,
+      name: product.name,
+      imgURL: product.imgURL,
+      price: product.price,
+      quantity: 1
+    }).subscribe({
+      next: (res) => {
+        console.log("Added:", res);
+        alert('Added to cart successfully!');
+      },
+      error: (err) => {
+        console.log(err);
+        alert('Failed to add to cart');
+      }
+    });
+  }
 }
 

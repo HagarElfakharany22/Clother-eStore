@@ -60,6 +60,8 @@
             <button class="btn-edit" (click)="openStatusModal(order)" title="Change Status">
               Edit
             </button>
+           
+  <button (click)="approveRefund(order)" *ngIf="order.orderStatus==='request refund'">✔</button>
           </td>
         </tr>
       </tbody>
@@ -188,6 +190,7 @@
                 <td>{{ item.quantity }}</td>
                 <td>{{ item.priceAtOrder | currency:'EGP' }}</td>
                 <td>{{ (item.quantity * item.priceAtOrder) | currency:'EGP' }}</td>
+                
               </tr>
             </tbody>
             <tfoot>

@@ -1,67 +1,68 @@
-<div class="hero position-relative text-white rounded mb-4 overflow-hidden" style="background: url('hero-bg.jpg') center/cover no-repeat; height: 300px;">
-  <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100" style="background-color: rgba(0,0,0,0.5);"></div>
-  
-  <div class="hero-content position-relative d-flex flex-column justify-content-center align-items-center h-100 text-center px-3">
-    <h1 class="display-4 fw-bold">Welcome to Clother</h1>
-    <p class="lead">Best products, fast delivery</p>
-    <a href="/products" class="btn btn-primary btn-lg mt-3">Shop Now</a>
+<div class="container">
+  <!-- Hero Section -->
+  <div class="hero position-relative text-white rounded mb-4 overflow-hidden"
+    style="background: url('hero-bg.jpg') center/cover no-repeat; height: 300px;">
+    <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100" style="background-color: rgba(0,0,0,0.5);">
+    </div>
+    <div
+      class="hero-content position-relative d-flex flex-column justify-content-center align-items-center h-100 text-center px-3">
+      <h1 class="display-4 fw-bold">Welcome to Clother</h1>
+      <p class="lead">Best products, fast delivery</p> <a href="/products" class="btn-shop">Shop
+        Now</a>
+    </div>
   </div>
-</div>
 
-
-
-<section class="mb-4">
-    <h4>Best Sellers</h4>
-       <div class="row g-3">
-        <div class="col-6 col-md-3" *ngFor="let p of bestSellers">
-            <div class="card h-100">
-                <img [src]="uploadUrl+p.imgURL" class="card-img-top" alt="">
-                <div class="card-body small">
-                    <div class="d-flex justify-content-between">
-                        <div>{{p.name}}</div>
-                        <div class="text-primary">${{p.price}}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-<section>
-    <h4>New Arrivals</h4>
-    <div class="row g-3">
-        <div class="col-6 col-md-3" *ngFor="let p of newArrivals">
-            <div class="card h-100">
-                <img [src]="uploadUrl+p.imgURL" class="card-img-top" alt="">
-                <div class="card-body small">
-                    <div class="d-flex justify-content-between">
-                        <div>{{p.name}}</div>
-                        <div class="text-primary">${{p.price}}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<section class="mb-6 testimonials">
-  <h4 class="section-title">Reviews of our clients</h4>
-
-  <div class="row g-3">
-    <div class="col-12 col-md-6 col-lg-4" *ngFor="let p of testMonials">
-      <div class="testimonial-card">
-        <div class="testimonial-header">
-          <div class="user-avatar">
-            {{ p.user.name[0] | uppercase }}
+  <!-- Best Sellers Section -->
+  <section>
+    <h2 class="section-title">Best Sellers</h2>
+    <div class="products-grid">
+      <!-- Product Card 1 -->
+      <div class="product-card" *ngFor="let p of bestSellers">
+        <img [src]="uploadUrl+p.imgURL" class="product-image" alt="">
+        <div class="product-body">
+          <div class="product-info">
+            <h3 class="product-name">{{p.name}}</h3>
+            <div class="product-price">${{p.price}}</div>
           </div>
-          <div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- New Arrivals Section -->
+  <section>
+    <h2 class="section-title">New Arrivals</h2>
+    <div class="products-grid">
+      <!-- Product Card 1 -->
+      <div class="product-card" *ngFor="let p of newArrivals">
+        <img [src]="uploadUrl+p.imgURL" class="product-image" alt="">
+        <div class="product-body">
+          <div class="product-info">
+            <h3 class="product-name">{{p.name}}</h3>
+            <div class="product-price">${{p.price}}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section>
+    <h2 class="section-title">Reviews of our clients</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card" *ngFor="let p of testMonials">
+        <div class="testimonial-header">
+          <div class="user-avatar">{{ p.user.name[0] | uppercase }}</div>
+          <div class="user-info">
             <h5 class="user-name">{{ p.user.name }}</h5>
             <div class="user-rating">⭐ {{ p.rating }}</div>
           </div>
         </div>
-
         <p class="message">{{ p.message }}</p>
       </div>
+
+
     </div>
-  </div>
-</section>
+  </section>
+</div>

@@ -22,6 +22,8 @@ cart: ICart | null = null;
   ) {}
 
   ngOnInit(): void {
+    
+
     this.loadCart();
   }
 
@@ -112,8 +114,10 @@ cart: ICart | null = null;
   proceedToCheckout(): void {
     if (!this.cart || this.cart.items.length === 0) {
       alert('Your cart is empty!');
+      
       return;
     }
+    // this.loadCart();
     this.router.navigate(['/checkout']);
   }
   // navigate(){

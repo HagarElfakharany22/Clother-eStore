@@ -6,6 +6,7 @@ import { CartService } from '../../cores/services/cart-service';
 import { OrderService } from '../../cores/services/order-service';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { AuthService } from '../../cores/services/auth-service';
 
 @Component({
   selector: 'app-checkout',
@@ -23,7 +24,8 @@ uploadUrl=environment.staticFilesURL;
    
     private cartService: CartService,
     private orderService: OrderService,
-    private router: Router
+    private router: Router,
+    private _auth:AuthService,
   ) {
     this.checkoutForm = new FormGroup({
       governate:new FormControl ('', Validators.required),
@@ -34,9 +36,16 @@ uploadUrl=environment.staticFilesURL;
   }
 
   ngOnInit(): void {
+     if (!this.isLoggedIn()) {
+      alert('Please login to checkout');
+      this.router.navigate(['/login']);
+      return;
+    }
     this.loadCart();
   }
-
+ private isLoggedIn(): boolean {
+   return this._auth.isLoggedIn();
+  }
   loadCart(): void {
     this.isLoading = true;
     this.cartService.getCart().subscribe({
@@ -90,10 +99,10 @@ uploadUrl=environment.staticFilesURL;
       next: (res) => {
         this.isSubmitting = false;
         alert('Order placed successfully!');
-        
+        // this.loadCart();
+        this.cartService.updateCartCount();
         this.cartService.clearCart().subscribe();
         
-        this.router.navigate(['/order-success', res.data._id]);
       },
       error: (err) => {
         console.error('Error placing order:', err);

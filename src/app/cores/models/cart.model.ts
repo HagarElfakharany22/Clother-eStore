@@ -2,6 +2,9 @@
 export interface Iitem {
   productId: string;
   quantity: number;
+  imgURL:string;
+  price:number;
+  name:string
 }
 
 export interface ICartItem {

@@ -26,7 +26,7 @@
     <div class="cart-items">
       <div class="cart-item" *ngFor="let item of cart.items">
         <div class="item-image">
-          <img [src]="uploadUrl+item.productId.imgURL || 'assets/placeholder.jpg'" [alt]="item.productId.name" />
+          <img [src]="uploadUrl+item.productId.imgURL" [alt]="item.productId.name" />
         </div>
 
         <div class="item-details">

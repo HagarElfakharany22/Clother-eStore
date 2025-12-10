@@ -15,18 +15,20 @@
 <li class="nav-item dropdown">
 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button">Account</a>
 <ul class="dropdown-menu dropdown-menu-end">
-<li *ngIf="islogged===true">
+<li *ngIf="islogged===true &&isAdmin===false">
   <a class="dropdown-item" routerLink="account">Profile</a>
 </li>
 
 <li *ngIf="islogged===false">
   <a class="dropdown-item" routerLink="login">Login</a>
 </li>
-
-<li><a class="dropdown-item" routerLink="orders">Orders</a></li>
-<li><a class="dropdown-item" routerLink="testmon">write Review</a></li>
+<li *ngIf="isAdmin">
+  <a class="dropdown-item" routerLink="dashboard"  *ngIf="isAdmin">Dashboard</a>
+</li>
+<li><a class="dropdown-item" routerLink="orders" *ngIf="isAdmin===false && islogged">Orders</a></li>
+<li><a class="dropdown-item" routerLink="testmon"  *ngIf="isAdmin===false && islogged">write Review</a></li>
 <li><hr class="dropdown-divider"></li>
-<li><a class="dropdown-item" (click)="logout()">Logout</a></li>
+<li><a class="dropdown-item" (click)="logout()" *ngIf="islogged">Logout</a></li>
 </ul>
 </li>
 </ul>

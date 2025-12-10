@@ -28,7 +28,7 @@ export interface IOrder {
   phone: string;
   items: IOrderItem[];
   totalPrice: number;
-  orderStatus: 'pending' | 'prepared' | 'shipped' | 'recieved' | 'returned' | 'refund' | 'refused' | 'canceled';
+  orderStatus: 'pending' | 'prepared' | 'shipped' | 'recieved' | 'returned' | 'request refund'|'refund' | 'refused' | 'canceled';
   orderAt: Date;
 }
 

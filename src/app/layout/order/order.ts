@@ -4,6 +4,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../../cores/services/order-service';
 import { environment } from '../../environments/environment';
+import { CartService } from '../../cores/services/cart-service';
 
 @Component({
   selector: 'app-order',
@@ -39,7 +40,7 @@ export class Order implements OnInit {
 
   constructor(
     private orderService: OrderService,
-  
+    private cartService:CartService
   ) {
     this.editForm =new FormGroup({
       governate:new FormControl ('', Validators.required),
@@ -50,6 +51,7 @@ export class Order implements OnInit {
   }
 
   ngOnInit(): void {
+    
     this.loadOrders();
   }
 
@@ -190,4 +192,29 @@ export class Order implements OnInit {
   getTotalItems(order: IOrder): number {
     return order.items.reduce((total, item) => total + item.quantity, 0);
   }
+  requestRefund(order: IOrder): void {
+    console.log(order.orderStatus);
+    
+  if (order.orderStatus !== 'recieved') {
+    alert("You can only request a refund after receiving the order");
+    return;
+  }
+
+  if (!confirm("Are you sure you want to request a refund for this order?")) return;
+
+  this.isLoading = true;
+  this.orderService.updateOrder(order._id, { orderStatus: 'request refund' }).subscribe({
+    next: (res) => {
+      this.isLoading = false;
+      alert(res.message || 'Refund requested successfully!');
+      this.loadOrders();
+    },
+    error: (err) => {
+      this.isLoading = false;
+      console.error('Error requesting refund:', err);
+      alert(err.error?.message || 'Failed to request refund');
+    }
+  });
+}
+
 }

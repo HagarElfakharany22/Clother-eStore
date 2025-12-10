@@ -15,23 +15,27 @@ export class Layout implements OnInit {
 searchQuery = '';
 cartCount = 0;
 constructor(private cartService:CartService,private _authService:AuthService ,private _router:Router){}
+
 ngOnInit(): void {
-  this.cartService.getCart().subscribe({
-    next:(res)=>{
-     this.cartCount= res.data.items.length;
-     this.loadCart();
-    }
-  })
- 
+  
+  this.cartService.cartItemsCount.subscribe(count => {
+    this.cartCount = count;
+  });
+  console.log(this.cartCount)
+  this.loadUser();
 }
 islogged = false;
-
+isAdmin=false;
 loadUser(): void {
+  console.log(this.islogged);
+  
   this._authService.getUserData().subscribe({
     next: (res) => {
       if (res?.name) {
         this.islogged = true;
         console.log(this.islogged);
+        if(res.role==='admin')
+          this.isAdmin=true;
         
       } else {
         this.islogged = false;
@@ -61,7 +65,8 @@ loadUser(): void {
     });
   }
 onSearch(){ }; 
-logout(){ this._authService.logOut() ;
+logout(){ 
+  this._authService.logOut() ;
   this._router.navigate(['/home']);
 }
 }

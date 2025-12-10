@@ -33,4 +33,7 @@ export class OrderService {
       orderStatus: 'canceled',
     });
   }
+  approveRefund(orderId: string, updates: Partial<IOrder>): Observable<IOrderResponse>{
+    return this._http.put<IOrderResponse>(`${this.apiURL}/approverefund/${orderId}`,{orderStatus: 'refund'})
+  }
 }

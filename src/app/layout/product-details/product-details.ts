@@ -16,6 +16,7 @@ import { CartService } from '../../cores/services/cart-service';
 export class ProductDetails implements OnInit{
 constructor(private _activeRoute: ActivatedRoute,private _productService:ProductService,private _cartService:CartService){}
 product!:IProduct;
+quantity=1;
 staticURL = environment.staticFilesURL;
 slug!:string | null;
 ngOnInit(): void {
@@ -30,10 +31,14 @@ ngOnInit(): void {
   
   }
 }
-addToCart(id:string){
+addToCart(){
+  if (!this.product) return;
      this._cartService.addToCart({
-    productId: id,
-    quantity: 1
+    productId:this.product._id,
+    imgURL:this.product.imgURL,
+    name:this.product.name,
+    price:this.product.price,
+    quantity: this.quantity
   }).subscribe({
     next: (res) => {
       console.log("Added:", res);
@@ -44,4 +49,13 @@ addToCart(id:string){
     }
   })
 }
+  increaseQuantity(): void {
+    this.quantity++;
+  }
+
+  decreaseQuantity(): void {
+    if (this.quantity > 1) {
+      this.quantity--;
+    }
+  }
 }

@@ -27,8 +27,8 @@ export class AuthService {
         const token = res.data;
 
         this.setToken(token);
-
-        const decode = this.tokenDecode(token)
+        const decode = this.tokenDecode(token);
+        console.log(decode);
         if (decode) {
           if (decode.role === 'admin') {
 
@@ -123,5 +123,7 @@ export class AuthService {
   public getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
-
+   public isLoggedIn(): boolean {
+    return !!localStorage.getItem(this.TOKEN_KEY);
+  }
 }

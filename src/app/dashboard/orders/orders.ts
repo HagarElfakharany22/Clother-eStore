@@ -138,4 +138,22 @@ export class Orders implements OnInit {
   getTotalItems(order: IOrder): number {
     return order.items.reduce((total, item) => total + item.quantity, 0);
   }
+  approveRefund(order:IOrder): void {
+  if (!confirm('Approve refund for this order?')) return;
+
+  this.isLoading = true;
+  this.orderService.approveRefund(order._id,{orderStatus: 'refund'}).subscribe({
+    next: (res) => {
+      this.isLoading = false;
+      alert(res.message);
+      this.loadOrders();
+    },
+    error: (err) => {
+      this.isLoading = false;
+      console.error(err);
+      alert('Failed to approve refund');
+    }
+  });
+}
+
 }

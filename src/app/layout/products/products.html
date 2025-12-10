@@ -1,19 +1,24 @@
 <div class="products-page">
+  <!-- Header -->
   <div class="page-header">
     <h1>Products</h1>
-    <p class="results-count">{{ filteredProducts.length }} products found</p>
+    <p class="results-count">{{ displayedProducts.length }} products found</p>
   </div>
 
   <div class="products-container">
+    
+    <!-- Sidebar Filters -->
     <aside class="filters-sidebar">
       <div class="filters-header">
         <h3>Filters</h3>
         <button class="clear-btn" (click)="clearFilters()">Clear All</button>
       </div>
 
+      <!-- Search -->
       <div class="filter-group">
-        <label>Search</label>
+        <label for="search">Search</label>
         <input 
+          id="search"
           type="text" 
           [(ngModel)]="searchTerm"
           (input)="onSearch()"
@@ -22,9 +27,15 @@
         />
       </div>
 
+      <!-- Category -->
       <div class="filter-group">
-        <label>Category</label>
-        <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()" class="filter-select">
+        <label for="category">Category</label>
+        <select 
+          id="category"
+          [(ngModel)]="selectedCategory" 
+          (change)="onCategoryChange()" 
+          class="filter-select"
+        >
           <option value="">All Categories</option>
           <option *ngFor="let cat of categories" [value]="cat.slug">
             {{ cat.name }}
@@ -32,9 +43,15 @@
         </select>
       </div>
 
+      <!-- Subcategory -->
       <div class="filter-group" *ngIf="subcategories.length > 0">
-        <label>Subcategory</label>
-        <select [(ngModel)]="selectedSubcategory" (change)="applyFilters()" class="filter-select">
+        <label for="subcategory">Subcategory</label>
+        <select 
+          id="subcategory"
+          [(ngModel)]="selectedSubcategory" 
+          (change)="applyFilters()" 
+          class="filter-select"
+        >
           <option value="">All Subcategories</option>
           <option *ngFor="let sub of subcategories" [value]="sub.slug">
             {{ sub.name }}
@@ -42,6 +59,7 @@
         </select>
       </div>
 
+      <!-- Price Range -->
       <div class="filter-group">
         <label>Price Range</label>
         <div class="price-inputs">
@@ -61,30 +79,34 @@
         </div>
       </div>
 
-      <button class="apply-btn" (click)="applyFilters()">
-        Apply Filters
-      </button>
+      <button class="apply-btn" (click)="applyFilters()">Apply Filters</button>
     </aside>
 
+    <!-- Products Grid -->
     <div class="products-content">
+
+      <!-- Loading Spinner -->
       <div class="loading" *ngIf="isLoading">
         <div class="spinner"></div>
         <p>Loading products...</p>
       </div>
 
+      <!-- Products List -->
       <div class="products-grid" *ngIf="!isLoading && displayedProducts.length > 0">
         <div class="product-card" *ngFor="let product of displayedProducts">
           <div class="product-image">
-            <img [src]="uploadUrl+product.imgURL" [alt]="product.name" />
+            <img [src]="uploadUrl + product.imgURL" [alt]="product.name" />
           </div>
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
-            <p class="product-category" *ngIf="product.Category">
-              {{ product.Category.name }}
-            </p>
+            <p class="product-category" *ngIf="product.Category">{{ product.Category.name }}</p>
             <p class="product-price">{{ product.price | currency:'EGP' }}</p>
-            <button class="view-btn" ><a [routerLink]="['/products', product.slug]">View Details</a></button>
-            <button class="add-btn" (click)="addToCart(product._id)">Add to cart</button>
+            <div class="product-actions">
+              <button class="view-btn">
+                <a [routerLink]="['/products', product.slug]">View Details</a>
+              </button>
+              <button class="add-btn" (click)="addToCart(product)">Add to cart</button>
+            </div>
           </div>
         </div>
       </div>
@@ -97,11 +119,7 @@
 
       <!-- Pagination -->
       <div class="pagination" *ngIf="!isLoading && totalPages > 1">
-        <button 
-          class="page-btn" 
-          (click)="previousPage()" 
-          [disabled]="currentPage === 1"
-        >
+        <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
           ← Previous
         </button>
 
@@ -114,14 +132,11 @@
           {{ page }}
         </button>
 
-        <button 
-          class="page-btn" 
-          (click)="nextPage()" 
-          [disabled]="currentPage === totalPages"
-        >
+        <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
           Next →
         </button>
       </div>
+
     </div>
   </div>
 </div>

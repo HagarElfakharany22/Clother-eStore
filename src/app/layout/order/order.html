@@ -83,6 +83,13 @@
         >
           Cancel
         </button>
+        <button 
+          class="btn-cancel" 
+          (click)="requestRefund(order)" 
+          *ngIf="order.orderStatus === 'recieved'"
+        >
+          Request Refund
+        </button>
       </div>
     </div>
   </div>
